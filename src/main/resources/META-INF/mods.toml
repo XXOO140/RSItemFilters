@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="rsitemfilters"
+version="${version}"
+displayName="RS Item Filters"
+description='''Adds Just Enough Filters-style item category filters (food, tools, armor, enchanted books, fuel, blocks, items) to the Refined Storage Grid.'''
+authors="RSItemFilters"
+
+[[dependencies.rsitemfilters]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.rsitemfilters]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.rsitemfilters]]
+    modId="refinedstorage"
+    mandatory=true
+    versionRange="[1.12.4,1.13.0)"
+    ordering="NONE"
+    side="CLIENT"

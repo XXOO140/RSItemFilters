@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.rsitemfilters.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "rsitemfilters.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "GridViewImplMixin",
+    "GridScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
