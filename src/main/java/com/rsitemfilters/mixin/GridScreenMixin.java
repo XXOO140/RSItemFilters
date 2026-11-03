@@ -5,6 +5,7 @@ import com.refinedmods.refinedstorage.screen.grid.view.IGridView;
 import com.rsitemfilters.filter.CategoryState;
 import com.rsitemfilters.filter.GridCategoryFilter;
 import com.rsitemfilters.filter.ItemCategory;
+import com.rsitemfilters.filter.TradeableIndex;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -33,11 +34,17 @@ public abstract class GridScreenMixin {
         int startX = x + 227 + 4;
         int startY = y + 6;
 
-        ItemCategory[] categories = ItemCategory.values();
-        for (int i = 0; i < categories.length; i++) {
-            ItemCategory category = categories[i];
+        int index = 0;
+        for (ItemCategory category : ItemCategory.values()) {
+            // The tradeable category only makes sense when the selling mod
+            // (and therefore its synced trade list) is present.
+            if (category == ItemCategory.TRADEABLE && !TradeableIndex.isAvailable()) {
+                continue;
+            }
+
             int bx = startX;
-            int by = startY + i * (buttonHeight + gap);
+            int by = startY + index * (buttonHeight + gap);
+            index++;
 
             Button button = self.addButton(bx, by, buttonWidth, buttonHeight,
                     Component.translatable(category.getLangKey()),
@@ -47,6 +54,12 @@ public abstract class GridScreenMixin {
                         // Visual feedback: prefix a check mark while active.
                         btn.setMessage(Component.literal(active ? "✓ " : "")
                                 .append(Component.translatable(category.getLangKey())));
+
+                        // Pull a fresh trade list before filtering, so items
+                        // added on the server show up without reopening the grid.
+                        if (category == ItemCategory.TRADEABLE) {
+                            TradeableIndex.refresh();
+                        }
 
                         // Rebuild the view first (this restores the full,
                         // un-filtered list), then trim it to the category.
@@ -60,6 +73,6 @@ public abstract class GridScreenMixin {
                         LOGGER.info("[RSItemFilters] clicked {} -> active={}", category, active);
                     });
         }
-        LOGGER.info("[RSItemFilters] Added {} category buttons to GridScreen", categories.length);
+        LOGGER.info("[RSItemFilters] Added {} category buttons to GridScreen", index);
     }
 }

@@ -5,5 +5,6 @@
   "rsitemfilters.category.enchanted_book": "附魔书",
   "rsitemfilters.category.fuel": "燃料",
   "rsitemfilters.category.block": "方块",
-  "rsitemfilters.category.item": "物品"
+  "rsitemfilters.category.item": "物品",
+  "rsitemfilters.category.tradeable": "可交易"
 }

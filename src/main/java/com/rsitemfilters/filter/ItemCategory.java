@@ -26,7 +26,12 @@ public enum ItemCategory {
     ENCHANTED_BOOK(Items.ENCHANTED_BOOK, "enchanted_book"),
     FUEL(Items.COAL, "fuel"),
     BLOCK(Items.GRASS_BLOCK, "block"),
-    ITEM(Items.IRON_INGOT, "item");
+    ITEM(Items.IRON_INGOT, "item"),
+    /**
+     * Items the selling bin accepts, read from the economy mod's synced
+     * trade list. Hidden from the UI when that mod is absent.
+     */
+    TRADEABLE(Items.EMERALD, "tradeable");
 
     private final Item iconItem;
     private final String langKey;
@@ -83,6 +88,10 @@ public enum ItemCategory {
 
             case ITEM:
                 return !(item instanceof BlockItem);
+
+            case TRADEABLE:
+                // Items accepted by the selling bin (see TradeableIndex).
+                return TradeableIndex.isTradeable(stack);
 
             default:
                 return false;

@@ -5,5 +5,6 @@
   "rsitemfilters.category.enchanted_book": "Enchanted Books",
   "rsitemfilters.category.fuel": "Fuel",
   "rsitemfilters.category.block": "Blocks",
-  "rsitemfilters.category.item": "Items"
+  "rsitemfilters.category.item": "Items",
+  "rsitemfilters.category.tradeable": "Sellable"
 }
