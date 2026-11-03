@@ -93,11 +93,17 @@ gradle build
 
 ## 🏗️ 实现说明
 
-- 通过 **Mixin** 注入：
-  - `GridScreen.onPostInit` → 在 Grid 顶部渲染分类按钮；
-  - `GridViewImpl.getActiveFilters` → 在过滤链尾部叠加分类过滤 `Predicate`。
-- 判定逻辑逐行移植自 [JustEnoughFilters](https://github.com/pSUNSET/JustEnoughFilters) 的 `builtin/ToggledFilters.kt`。
-- 分类状态为客户端共享（`CategoryState`），切换分类后调用 `forceSort()` 即时刷新。
+- `GridScreenMixin` 注入 `GridScreen.onPostInit`，在 Grid 右侧渲染 7 个分类按钮。
+- `GridCategoryFilter` 直接过滤 `IGridView.getStacks()` 返回的**真实显示列表**：
+  该列表就是各实现用于渲染的那个列表（RS 原版是私有字段 `stacks`，
+  其他实现如 rs_integration（共振存储）的 `UnifiedGridView` 是 `visible`），
+  所以原地 `removeIf` 对任何视图实现都生效，不依赖具体类。
+- `ClientEvents` 每 5 tick 复查一次，因为网络同步会重建视图列表，
+  只过滤一次的话筛选结果过一会儿就会失效。
+- `GridViewImplMixin` 作为补充：在 `forceSort()` 结束后裁剪 `stacks` 字段。
+- 判定逻辑逐行移植自 [JustEnoughFilters](https://github.com/pSUNSET/JustEnoughFilters) 的 `builtin/ToggledFilters.kt`，
+  并针对 1.20.1 的旧 API 做了适配（`isEdible()` / `ArmorItem` / `TieredItem` / `ForgeHooks.getBurnTime`）。
+- 分类状态为客户端共享（`CategoryState`），切换分类后先 `forceSort()` 重建完整列表、再立即过滤。
 
 ---
 
@@ -111,14 +117,17 @@ RSItemFilters/
 └── src/main/
     ├── java/com/rsitemfilters/
     │   ├── RSItemFilters.java       # 模组主类
+    │   ├── ClientEvents.java        # 定时复查，防止筛选被重建的列表覆盖
     │   ├── filter/
     │   │   ├── ItemCategory.java    # 7 个分类的判定逻辑（核心）
-    │   │   └── CategoryState.java   # 当前选中分类状态
+    │   │   ├── CategoryState.java   # 当前选中分类状态
+    │   │   └── GridCategoryFilter.java  # 过滤 IGridView 的显示列表
     │   └── mixin/
     │       ├── GridScreenMixin.java     # 注入分类按钮
-    │       └── GridViewImplMixin.java   # 注入过滤逻辑
+    │       └── GridViewImplMixin.java   # forceSort 后裁剪 stacks
     └── resources/
         ├── META-INF/mods.toml
+        ├── pack.mcmeta
         ├── rsitemfilters.mixins.json
         └── assets/rsitemfilters/lang/
             ├── zh_cn.json
