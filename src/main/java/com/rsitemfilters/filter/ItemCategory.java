@@ -1,21 +1,23 @@
 package com.rsitemfilters.filter;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Equippable;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.ForgeHooks;
 
 /**
- * Item category filters, ported from Just Enough Filters' ToggledFilters.
+ * Item category filters, adapted for Minecraft 1.20.1 (Forge 47).
  *
- * Each category mirrors JEF's matching logic so filtering "food", "tools",
- * "armor", "enchanted books", etc. behaves identically.
+ * Each category approximates JEF's "food / tools / armor / enchanted books /
+ * fuel / blocks / items" matching, but uses the 1.20.1 API surface (the
+ * upstream JEF targets 1.21's data-component API, which does not exist here).
  */
 public enum ItemCategory {
     FOOD(Items.APPLE, "food"),
@@ -42,60 +44,45 @@ public enum ItemCategory {
         return langKey;
     }
 
-    // Common ("c" = forge/common) tags used by JEF.
+    // Common ("c" = forge/common) tags, matching JEF's CTags.
     private static final TagKey<Item> C_FOODS = commonTag("foods");
     private static final TagKey<Item> C_TOOLS = commonTag("tools");
-    private static final TagKey<Item> C_HUMANOID_ARMORS = commonTag("armors/humanoid");
+    private static final TagKey<Item> C_ARMORS = commonTag("armors");
 
     private static TagKey<Item> commonTag(String path) {
-        return TagKey.create(Registries.ITEM, new ResourceLocation("c", path));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", path));
     }
 
     /**
      * Returns true if the given stack belongs to this category.
-     * Mirrors JEF's ToggledFilters matching exactly.
      */
     public boolean matches(ItemStack stack) {
+        Item item = stack.getItem();
         switch (this) {
             case FOOD:
-                // JEF: #c:foods tag OR has FOOD component
-                return stack.is(C_FOODS) || stack.has(DataComponents.FOOD);
+                // Tag OR edible item.
+                return stack.is(C_FOODS) || item.isEdible();
 
             case TOOL:
-                // JEF: TOOL component OR #c:tools tag OR
-                //      (MAX_DAMAGE && maxStackSize==1 && enchantable && not armor slot)
-                boolean b0 = stack.has(DataComponents.TOOL);
-                boolean b1 = stack.is(C_TOOLS);
-                Equippable eq = stack.get(DataComponents.EQUIPPABLE);
-                boolean b2 = stack.has(DataComponents.MAX_DAMAGE)
-                        && stack.getMaxStackSize() == 1
-                        && stack.isEnchantable()
-                        && (eq == null || !eq.slot().isArmor());
-                return b0 || b1 || b2;
+                // Tool/weapon tiered items (pickaxe/axe/shovel/sword/hoe) OR tag.
+                return item instanceof TieredItem || stack.is(C_TOOLS);
 
             case ARMOR:
-                // JEF: (MAX_DAMAGE && equipable.slot.type == HUMANOID_ARMOR) OR #c:armors/humanoid tag
-                Equippable eq2 = stack.get(DataComponents.EQUIPPABLE);
-                boolean a0 = stack.has(DataComponents.MAX_DAMAGE)
-                        && eq2 != null
-                        && eq2.slot().getType() == EquipmentSlot.Type.HUMANOID_ARMOR;
-                boolean a1 = stack.is(C_HUMANOID_ARMORS);
-                return a0 || a1;
+                // Armor item OR armor tag.
+                return item instanceof ArmorItem || stack.is(C_ARMORS);
 
             case ENCHANTED_BOOK:
                 return stack.is(Items.ENCHANTED_BOOK);
 
             case FUEL:
-                // JEF: Minecraft.level.fuelValues().isFuel(stack)
-                net.minecraft.client.multiplayer.ClientLevel level =
-                        net.minecraft.client.Minecraft.getInstance().level;
-                return level != null && level.fuelValues().isFuel(stack);
+                // 1.20.1 fuel check: positive burn time via ForgeHooks.
+                return ForgeHooks.getBurnTime(stack, RecipeType.SMELTING) > 0;
 
             case BLOCK:
-                return stack.getItem() instanceof BlockItem;
+                return item instanceof BlockItem;
 
             case ITEM:
-                return !(stack.getItem() instanceof BlockItem);
+                return !(item instanceof BlockItem);
 
             default:
                 return false;

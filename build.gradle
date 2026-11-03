@@ -12,10 +12,12 @@ base {
     archivesName = mod_id
 }
 
-// Use the locally-installed JDK (17 or 21) instead of auto-downloading a toolchain.
+// Compile with JDK 17 (required by ForgeGradle 6 for Minecraft 1.20.1).
+// Point JAVA_HOME / org.gradle.java.home to a JDK 17 installation to build.
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 minecraft {
@@ -63,6 +65,9 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenCentral()
+    maven { url = 'https://maven.aliyun.com/repository/public' }
+    maven { url = 'https://maven.parchmentmc.org' }
     maven {
         name = 'CurseMaven'
         url 'https://www.cursemaven.com'
@@ -80,11 +85,6 @@ dependencies {
     implementation fg.deobf("curse.maven:refined-storage-243076:4844585")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-    config "${mod_id}.mixins.json"
 }
 
 jar {
