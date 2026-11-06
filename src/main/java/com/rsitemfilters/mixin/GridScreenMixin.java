@@ -3,6 +3,7 @@ package com.rsitemfilters.mixin;
 import com.refinedmods.refinedstorage.screen.grid.GridScreen;
 import com.refinedmods.refinedstorage.screen.grid.view.IGridView;
 import com.rsitemfilters.filter.CategoryState;
+import com.rsitemfilters.filter.CurioIndex;
 import com.rsitemfilters.filter.GridCategoryFilter;
 import com.rsitemfilters.filter.ItemCategory;
 import com.rsitemfilters.filter.TradeableIndex;
@@ -36,9 +37,12 @@ public abstract class GridScreenMixin {
 
         int index = 0;
         for (ItemCategory category : ItemCategory.values()) {
-            // The tradeable category only makes sense when the selling mod
-            // (and therefore its synced trade list) is present.
+            // Categories backed by an optional mod are hidden when that mod is
+            // absent, so the column never shows a button that cannot work.
             if (category == ItemCategory.TRADEABLE && !TradeableIndex.isAvailable()) {
+                continue;
+            }
+            if (category == ItemCategory.ACCESSORY && !CurioIndex.isAvailable()) {
                 continue;
             }
 

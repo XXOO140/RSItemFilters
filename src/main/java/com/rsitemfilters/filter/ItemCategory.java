@@ -28,6 +28,11 @@ public enum ItemCategory {
     BLOCK(Items.GRASS_BLOCK, "block"),
     ITEM(Items.IRON_INGOT, "item"),
     /**
+     * Items that can be worn in an accessory slot (Curios). Hidden from the
+     * UI when Curios is absent.
+     */
+    ACCESSORY(Items.AMETHYST_SHARD, "accessory"),
+    /**
      * Items the selling bin accepts, read from the economy mod's synced
      * trade list. Hidden from the UI when that mod is absent.
      */
@@ -92,6 +97,10 @@ public enum ItemCategory {
             case TRADEABLE:
                 // Items accepted by the selling bin (see TradeableIndex).
                 return TradeableIndex.isTradeable(stack);
+
+            case ACCESSORY:
+                // Items wearable in a Curios slot (see CurioIndex).
+                return CurioIndex.isCurio(stack);
 
             default:
                 return false;

@@ -4,7 +4,7 @@
 [![Refined Storage](https://img.shields.io/badge/Refined%20Storage-1.12.4-blue)](https://www.curseforge.com/minecraft/mc-mods/refined-storage)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-为 **Refined Storage（精致存储）** 的 Grid 终端添加 **Just Enough Filters（JEF）风格** 的物品分类筛选按钮，让你在 RS 终端里也能像在 JEI 里那样，**一键筛出「所有食物 / 所有工具 / 所有装备 / 附魔书 / 燃料 / 方块 / 物品」**。
+为 **Refined Storage（精致存储）** 的 Grid 终端添加 **Just Enough Filters（JEF）风格** 的物品分类筛选按钮，让你在 RS 终端里也能像在 JEI 里那样，**一键筛出「所有食物 / 所有工具 / 所有装备 / 附魔书 / 燃料 / 方块 / 物品 / 饰品 / 可交易」**。
 
 > 灵感来自 [JustEnoughFilters](https://github.com/pSUNSET/JustEnoughFilters)。原版 JEF 只作用于 JEI/REI/EMI，本模组把它的分类过滤能力移植到了精致存储终端。
 
@@ -23,6 +23,8 @@
 | 🔥 燃料 | 煤炭 | `level.fuelValues().isFuel()` |
 | 🧱 方块 | 草方块 | 是 `BlockItem` |
 | 📦 物品 | 铁锭 | 不是 `BlockItem` |
+| 💎 饰品 | 紫水晶碎片 | 属于 `curios` 命名空间的任意物品标签（Curios 饰品栏可装备） |
+| 💰 可交易 | 绿宝石 | 香草梦家园出售配置 / 服务端同步交易表中的物品 |
 
 - **点击按钮切换筛选**，再点一次取消。
 - 分类筛选与 Grid 搜索框是 **AND 关系**，可自由组合（例如：先点「食物」按钮，再在搜索框输入 `@farmersdelight`，即可筛出农夫乐事的食物）。
@@ -93,7 +95,8 @@ gradle build
 
 ## 🏗️ 实现说明
 
-- `GridScreenMixin` 注入 `GridScreen.onPostInit`，在 Grid 右侧渲染 7 个分类按钮。
+- `GridScreenMixin` 注入 `GridScreen.onPostInit`，在 Grid 右侧渲染分类按钮（装了 Curios /
+  香草梦家园时额外各多一个按钮）。
 - `GridCategoryFilter` 直接过滤 `IGridView.getStacks()` 返回的**真实显示列表**：
   该列表就是各实现用于渲染的那个列表（RS 原版是私有字段 `stacks`，
   其他实现如 rs_integration（共振存储）的 `UnifiedGridView` 是 `visible`），
@@ -119,8 +122,10 @@ RSItemFilters/
     │   ├── RSItemFilters.java       # 模组主类
     │   ├── ClientEvents.java        # 定时复查，防止筛选被重建的列表覆盖
     │   ├── filter/
-    │   │   ├── ItemCategory.java    # 7 个分类的判定逻辑（核心）
+    │   │   ├── ItemCategory.java    # 各分类的判定逻辑（核心）
     │   │   ├── CategoryState.java   # 当前选中分类状态
+    │   │   ├── TradeableIndex.java  # 可交易物品索引（可选依赖，反射读取）
+    │   │   ├── CurioIndex.java      # 饰品判定（读 curios 物品标签，可选依赖）
     │   │   └── GridCategoryFilter.java  # 过滤 IGridView 的显示列表
     │   └── mixin/
     │       ├── GridScreenMixin.java     # 注入分类按钮
