@@ -4,7 +4,7 @@
 [![Refined Storage](https://img.shields.io/badge/Refined%20Storage-1.12.4-blue)](https://www.curseforge.com/minecraft/mc-mods/refined-storage)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-为 **Refined Storage（精致存储）** 的 Grid 终端添加 **Just Enough Filters（JEF）风格** 的物品分类筛选按钮，让你在 RS 终端里也能像在 JEI 里那样，**一键筛出「所有食物 / 所有工具 / 所有装备 / 附魔书 / 燃料 / 方块 / 物品 / 饰品 / 可交易」**。
+为 **Refined Storage（精致存储）** 的 Grid 终端添加 **Just Enough Filters（JEF）风格** 的物品分类筛选按钮，让你在 RS 终端里也能像在 JEI 里那样，**一键筛出「所有食物 / 所有工具 / 所有武器 / 所有装备 / 附魔书 / 燃料 / 方块 / 物品 / 饰品 / 可交易」**。
 
 > 灵感来自 [JustEnoughFilters](https://github.com/pSUNSET/JustEnoughFilters)。原版 JEF 只作用于 JEI/REI/EMI，本模组把它的分类过滤能力移植到了精致存储终端。
 
@@ -18,6 +18,7 @@
 |---|---|---|
 | 🍎 食物 | 苹果 | `#c:foods` 标签 **或** 含 `FOOD` 数据组件 |
 | ⛏️ 工具 | 钻石镐 | 含 `TOOL` 组件 **或** `#c:tools` **或**（有耐久 + 不可堆叠 + 可附魔 + 非护甲槽） |
+| ⚔️ 武器 | 钻石剑 | 剑/三叉戟/弓弩类（含 `ProjectileWeaponItem`）**或** `#forge:tools/swords|bows|crossbows|tridents` **或** 主手攻击力加成 ≥ +2 |
 | 🛡️ 装备 | 钻石胸甲 | `#c:armors/humanoid` **或**（有耐久 + 人形护甲槽） |
 | 📖 附魔书 | 附魔书 | 是附魔书 |
 | 🔥 燃料 | 煤炭 | `level.fuelValues().isFuel()` |
@@ -126,6 +127,7 @@ RSItemFilters/
     │   │   ├── CategoryState.java   # 当前选中分类状态
     │   │   ├── TradeableIndex.java  # 可交易物品索引（可选依赖，反射读取）
     │   │   ├── CurioIndex.java      # 饰品判定（读 curios 物品标签，可选依赖）
+    │   │   ├── WeaponDetector.java  # 武器判定（类判定 + 标签 + 攻击力属性）
     │   │   └── GridCategoryFilter.java  # 过滤 IGridView 的显示列表
     │   └── mixin/
     │       ├── GridScreenMixin.java     # 注入分类按钮

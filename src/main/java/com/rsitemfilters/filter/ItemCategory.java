@@ -22,16 +22,17 @@ import net.minecraftforge.common.ForgeHooks;
 public enum ItemCategory {
     FOOD(Items.APPLE, "food"),
     TOOL(Items.DIAMOND_PICKAXE, "tool"),
+    WEAPON(Items.DIAMOND_SWORD, "weapon"),
     ARMOR(Items.DIAMOND_CHESTPLATE, "armor"),
-    ENCHANTED_BOOK(Items.ENCHANTED_BOOK, "enchanted_book"),
-    FUEL(Items.COAL, "fuel"),
-    BLOCK(Items.GRASS_BLOCK, "block"),
-    ITEM(Items.IRON_INGOT, "item"),
     /**
      * Items that can be worn in an accessory slot (Curios). Hidden from the
      * UI when Curios is absent.
      */
     ACCESSORY(Items.AMETHYST_SHARD, "accessory"),
+    ENCHANTED_BOOK(Items.ENCHANTED_BOOK, "enchanted_book"),
+    FUEL(Items.COAL, "fuel"),
+    BLOCK(Items.GRASS_BLOCK, "block"),
+    ITEM(Items.IRON_INGOT, "item"),
     /**
      * Items the selling bin accepts, read from the economy mod's synced
      * trade list. Hidden from the UI when that mod is absent.
@@ -76,6 +77,10 @@ public enum ItemCategory {
             case TOOL:
                 // Tool/weapon tiered items (pickaxe/axe/shovel/sword/hoe) OR tag.
                 return item instanceof TieredItem || stack.is(C_TOOLS);
+
+            case WEAPON:
+                // Melee / ranged weapons, including modded ones (see WeaponDetector).
+                return WeaponDetector.isWeapon(stack);
 
             case ARMOR:
                 // Armor item OR armor tag.
